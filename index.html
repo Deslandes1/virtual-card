@@ -1,0 +1,514 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlobalInternet.py | Virtual Card</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #0a2f4e, #051c2b);
+            font-family: 'Segoe UI', 'Poppins', system-ui, sans-serif;
+            color: #fff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        .logo h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, #ffe6b0, #ffb347);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .logo p { font-size: 0.8rem; opacity: 0.7; }
+        .director {
+            background: rgba(255,255,255,0.1);
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+        }
+        .card-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        .card-preview {
+            flex: 1;
+            min-width: 280px;
+            background: linear-gradient(145deg, #1e3a5f, #0f2a44);
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.3);
+        }
+        .card-brand {
+            font-size: 1.2rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            color: #ffb347;
+        }
+        .card-number {
+            font-family: monospace;
+            font-size: 1.4rem;
+            letter-spacing: 2px;
+            margin: 20px 0;
+            background: rgba(0,0,0,0.5);
+            padding: 8px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .card-details {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        .card-holder, .card-expiry { font-size: 0.9rem; }
+        .balance {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #6effb0;
+        }
+        .pin-input {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .pin-input input {
+            flex: 1;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            padding: 8px;
+            border-radius: 40px;
+            color: white;
+            text-align: center;
+            font-size: 1rem;
+        }
+        button {
+            background: #ffb347;
+            border: none;
+            color: #0a2f4e;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        button:hover { background: #ffa01e; transform: scale(0.97); }
+        .action-panel {
+            flex: 1;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 20px;
+        }
+        .form-group { margin-bottom: 15px; }
+        label {
+            display: block;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+            opacity: 0.8;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 40px;
+            border: none;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            font-size: 1rem;
+        }
+        .transaction-list {
+            background: rgba(0,0,0,0.3);
+            border-radius: 24px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .success { color: #6effb0; }
+        .error { color: #ff8a8a; }
+        .hidden { display: none; }
+        .toggle-btn {
+            background: #2a5f7a;
+            margin-top: 10px;
+            width: 100%;
+        }
+        .change-pin-form {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 0.7rem;
+            opacity: 0.5;
+        }
+        @media (max-width: 700px) {
+            .card-grid { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <div class="logo">
+            <h1>🌐 GlobalInternet.py</h1>
+            <p>Virtual Card Solutions</p>
+        </div>
+        <div class="director">👨‍💼 Director: Gesner Deslandes</div>
+    </header>
+
+    <div class="card-grid">
+        <div class="card-preview">
+            <div class="card-brand">VIRTUAL CARD</div>
+            <div class="card-number" id="cardNumber">**** **** **** ****</div>
+            <div class="card-details">
+                <div class="card-holder" id="cardHolder">CARD HOLDER</div>
+                <div class="card-expiry" id="cardExpiry">MM/YY</div>
+            </div>
+            <div class="balance" id="balance">0.00 HTG</div>
+            <div class="pin-input">
+                <input type="password" id="transactionPin" placeholder="Enter PIN to authorize">
+            </div>
+            <button id="refreshCardBtn" style="background:#2a5f7a;">🔄 Refresh</button>
+            <button id="toggleChangePinBtn" class="toggle-btn">🔐 Change PIN</button>
+
+            <div id="changePinForm" class="change-pin-form hidden">
+                <div class="form-group">
+                    <label>Your Email</label>
+                    <input type="email" id="changeEmail" placeholder="card email">
+                </div>
+                <div class="form-group">
+                    <label>Verification Code</label>
+                    <input type="text" id="verificationCode" placeholder="6‑digit code">
+                </div>
+                <div class="form-group">
+                    <label>New PIN</label>
+                    <input type="password" id="newPin" placeholder="new PIN">
+                </div>
+                <button id="requestCodeBtn">📧 Request Code</button>
+                <button id="submitPinChangeBtn" style="margin-top: 10px;">✅ Change PIN</button>
+                <div id="pinChangeStatus" class="hidden" style="margin-top: 10px;"></div>
+            </div>
+        </div>
+
+        <div class="action-panel">
+            <h3>💳 Create your Virtual Card</h3>
+            <div class="form-group">
+                <label>Your ID / Email</label>
+                <input type="password" id="userId" autocomplete="off" placeholder="Enter your ID or email">
+            </div>
+            <div class="form-group">
+                <label>Name on Card</label>
+                <input type="text" id="cardHolderName" autocomplete="off" placeholder="Name as you want it on card">
+            </div>
+            <div class="form-group">
+                <label>Email (for PIN recovery)</label>
+                <input type="email" id="cardEmail" autocomplete="off" placeholder="your@email.com">
+            </div>
+            <div class="form-group">
+                <label>Set 4‑digit PIN (or password)</label>
+                <input type="password" id="cardPin" maxlength="20" autocomplete="off" placeholder="Enter PIN">
+            </div>
+            <button id="createCardBtn">✨ Create Card</button>
+
+            <hr style="margin: 20px 0; border-color: rgba(255,255,255,0.1);">
+
+            <h3>💰 Top Up with Moncash</h3>
+            <div class="form-group">
+                <label>Amount (HTG)</label>
+                <input type="number" id="topupAmount" placeholder="100">
+            </div>
+            <div class="form-group">
+                <label>Moncash Phone Number (payer)</label>
+                <input type="text" id="moncashPhone" placeholder="509-12345678">
+            </div>
+            <button id="topupBtn">💸 Top Up</button>
+            <div id="topupStatus" class="hidden" style="margin-top: 10px;"></div>
+        </div>
+    </div>
+
+    <div class="transaction-list">
+        <h3>📜 Transaction History</h3>
+        <div id="transactionContainer">
+            <div class="transaction-item">No transactions yet.</div>
+        </div>
+    </div>
+    <footer>Powered by Moncash | Secured by Supabase</footer>
+</div>
+
+<script>
+    let currentCardId = null;
+
+    const cardNumberElem = document.getElementById('cardNumber');
+    const cardHolderElem = document.getElementById('cardHolder');
+    const cardExpiryElem = document.getElementById('cardExpiry');
+    const balanceElem = document.getElementById('balance');
+    const refreshCardBtn = document.getElementById('refreshCardBtn');
+    const createCardBtn = document.getElementById('createCardBtn');
+    const topupBtn = document.getElementById('topupBtn');
+    const userIdInput = document.getElementById('userId');
+    const cardHolderNameInput = document.getElementById('cardHolderName');
+    const cardEmailInput = document.getElementById('cardEmail');
+    const cardPinInput = document.getElementById('cardPin');
+    const topupAmountInput = document.getElementById('topupAmount');
+    const moncashPhoneInput = document.getElementById('moncashPhone');
+    const transactionPinInput = document.getElementById('transactionPin');
+    const topupStatusDiv = document.getElementById('topupStatus');
+    const transactionContainer = document.getElementById('transactionContainer');
+
+    const toggleChangePinBtn = document.getElementById('toggleChangePinBtn');
+    const changePinForm = document.getElementById('changePinForm');
+    const changeEmailInput = document.getElementById('changeEmail');
+    const verificationCodeInput = document.getElementById('verificationCode');
+    const newPinInput = document.getElementById('newPin');
+    const requestCodeBtn = document.getElementById('requestCodeBtn');
+    const submitPinChangeBtn = document.getElementById('submitPinChangeBtn');
+    const pinChangeStatusDiv = document.getElementById('pinChangeStatus');
+
+    function showStatus(div, message, isError = false) {
+        div.classList.remove('hidden');
+        div.innerHTML = isError ? `<span class="error">❌ ${message}</span>` : `<span class="success">✅ ${message}</span>`;
+        setTimeout(() => div.classList.add('hidden'), 5000);
+    }
+
+    async function loadCard() {
+        if (!currentCardId) return;
+        try {
+            const res = await fetch(`/api/card/${currentCardId}`);
+            const data = await res.json();
+            if (data.success) {
+                const card = data.card;
+                cardNumberElem.innerText = card.card_number;
+                cardHolderElem.innerText = card.card_holder.toUpperCase();
+                cardExpiryElem.innerText = `${card.expiry_month}/${card.expiry_year}`;
+                balanceElem.innerText = `${card.balance} HTG`;
+                if (card.email) changeEmailInput.value = card.email;
+                loadTransactions(currentCardId);
+            } else {
+                console.error('Card load error:', data.error);
+                cardNumberElem.innerText = 'ERROR LOADING';
+            }
+        } catch (err) {
+            console.error('Fetch card error:', err);
+        }
+    }
+
+    async function loadTransactions(cardId) {
+        try {
+            const res = await fetch(`/api/card/${cardId}/transactions`);
+            const data = await res.json();
+            if (data.success && data.transactions.length) {
+                transactionContainer.innerHTML = '';
+                data.transactions.forEach(tx => {
+                    const div = document.createElement('div');
+                    div.className = 'transaction-item';
+                    div.innerHTML = `
+                        <span>${new Date(tx.created_at).toLocaleString()}</span>
+                        <span>${tx.type === 'deposit' ? '➕' : '➖'} ${tx.amount} HTG</span>
+                        <span class="success">${tx.status}</span>
+                    `;
+                    transactionContainer.appendChild(div);
+                });
+            } else {
+                transactionContainer.innerHTML = '<div class="transaction-item">No transactions yet.</div>';
+            }
+        } catch (err) {
+            console.error('Load transactions error:', err);
+        }
+    }
+
+    function saveCardId(id) {
+        localStorage.setItem('virtual_card_id', id);
+        currentCardId = id;
+    }
+
+    createCardBtn.addEventListener('click', async () => {
+        const userId = userIdInput.value.trim();
+        const cardHolder = cardHolderNameInput.value.trim();
+        const email = cardEmailInput.value.trim();
+        const pin = cardPinInput.value.trim();
+        if (!userId || !cardHolder || !email || !pin) {
+            alert('Please fill in all fields: ID, Card Holder Name, Email, and PIN.');
+            return;
+        }
+        createCardBtn.disabled = true;
+        createCardBtn.textContent = 'Creating...';
+        try {
+            const res = await fetch('/api/card/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, cardHolder, email, pin })
+            });
+            const data = await res.json();
+            if (data.success) {
+                saveCardId(data.card.id);
+                alert(`Your new virtual card:\nNumber: ${data.card.number}\nCVV: ${data.card.cvv}\nExpiry: ${data.card.expiry}\n\nKeep this information safe!`);
+                loadCard();
+                userIdInput.value = '';
+                cardHolderNameInput.value = '';
+                cardEmailInput.value = '';
+                cardPinInput.value = '';
+            } else {
+                alert('Error: ' + (data.error || 'Unknown error'));
+            }
+        } catch (err) {
+            console.error('Create card error:', err);
+            alert('Failed to create card. Check console for details.');
+        } finally {
+            createCardBtn.disabled = false;
+            createCardBtn.textContent = '✨ Create Card';
+        }
+    });
+
+    topupBtn.addEventListener('click', async () => {
+        if (!currentCardId) {
+            alert('Please create a card first.');
+            return;
+        }
+        const amount = parseInt(topupAmountInput.value);
+        const phone = moncashPhoneInput.value.trim();
+        const pin = transactionPinInput.value.trim();
+        if (isNaN(amount) || amount <= 0) {
+            alert('Enter a valid amount');
+            return;
+        }
+        if (!phone) {
+            alert('Enter the Moncash phone number that will pay');
+            return;
+        }
+        if (!pin) {
+            alert('Enter your card PIN to authorize the transaction');
+            return;
+        }
+        topupBtn.disabled = true;
+        topupBtn.textContent = 'Processing...';
+        try {
+            const res = await fetch('/api/card/topup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cardId: currentCardId, amount, phone, pin })
+            });
+            const data = await res.json();
+            if (data.success && data.redirectUrl) {
+                window.location.href = data.redirectUrl;
+            } else {
+                showStatus(topupStatusDiv, data.error || 'Top-up failed', true);
+            }
+        } catch (err) {
+            console.error('Top-up error:', err);
+            showStatus(topupStatusDiv, 'Network error', true);
+        } finally {
+            topupBtn.disabled = false;
+            topupBtn.textContent = '💸 Top Up';
+        }
+    });
+
+    refreshCardBtn.addEventListener('click', () => {
+        if (currentCardId) loadCard();
+        else alert('No card loaded yet. Create one first.');
+    });
+
+    toggleChangePinBtn.addEventListener('click', () => {
+        changePinForm.classList.toggle('hidden');
+        if (!currentCardId) {
+            alert('Create a card first to change its PIN.');
+            changePinForm.classList.add('hidden');
+        }
+    });
+
+    requestCodeBtn.addEventListener('click', async () => {
+        if (!currentCardId) {
+            alert('No card selected. Create or refresh a card first.');
+            return;
+        }
+        const email = changeEmailInput.value.trim();
+        if (!email) {
+            alert('Please enter your email address.');
+            return;
+        }
+        requestCodeBtn.disabled = true;
+        requestCodeBtn.textContent = 'Sending...';
+        try {
+            const res = await fetch('/api/card/request-pin-change', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cardId: currentCardId, email })
+            });
+            const data = await res.json();
+            if (data.success) {
+                showStatus(pinChangeStatusDiv, data.message);
+            } else {
+                showStatus(pinChangeStatusDiv, data.error || 'Request failed', true);
+            }
+        } catch (err) {
+            console.error('Request code error:', err);
+            showStatus(pinChangeStatusDiv, 'Network error', true);
+        } finally {
+            requestCodeBtn.disabled = false;
+            requestCodeBtn.textContent = '📧 Request Code';
+        }
+    });
+
+    submitPinChangeBtn.addEventListener('click', async () => {
+        if (!currentCardId) {
+            alert('No card selected.');
+            return;
+        }
+        const code = verificationCodeInput.value.trim();
+        const newPin = newPinInput.value.trim();
+        if (!code || !newPin) {
+            alert('Please enter the verification code and your new PIN.');
+            return;
+        }
+        submitPinChangeBtn.disabled = true;
+        submitPinChangeBtn.textContent = 'Updating...';
+        try {
+            const res = await fetch('/api/card/change-pin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cardId: currentCardId, code, newPin })
+            });
+            const data = await res.json();
+            if (data.success) {
+                showStatus(pinChangeStatusDiv, data.message);
+                verificationCodeInput.value = '';
+                newPinInput.value = '';
+                changePinForm.classList.add('hidden');
+            } else {
+                showStatus(pinChangeStatusDiv, data.error || 'Change failed', true);
+            }
+        } catch (err) {
+            console.error('Change PIN error:', err);
+            showStatus(pinChangeStatusDiv, 'Network error', true);
+        } finally {
+            submitPinChangeBtn.disabled = false;
+            submitPinChangeBtn.textContent = '✅ Change PIN';
+        }
+    });
+
+    const storedCardId = localStorage.getItem('virtual_card_id');
+    if (storedCardId) {
+        currentCardId = storedCardId;
+        loadCard();
+    }
+</script>
+</body>
+</html>
