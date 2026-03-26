@@ -1,0 +1,50 @@
+ <!DOCTYPE html>
+<html>
+<head>
+    <title>Payment Result</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { background: #0a2f4e; color: white; font-family: sans-serif; text-align: center; padding: 50px; }
+        .success { color: #6effb0; }
+        .error { color: #ff8a8a; }
+        button { background: #ffb347; border: none; padding: 10px 20px; border-radius: 40px; margin-top: 20px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h2>Payment Processing</h2>
+    <div id="message">Please wait...</div>
+    <button onclick="window.location.href='/'">Return to Dashboard</button>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const status = params.get('status');
+        const reference = params.get('ref');
+        if (status === 'success') {
+            document.getElementById('message').innerHTML = '<span class="success">✅ Payment successful! Your card balance has been updated.</span>';
+        } else if (status === 'failed') {
+            document.getElementById('message').innerHTML = '<span class="error">❌ Payment failed. Please try again.</span>';
+        } else if (reference) {
+            document.getElementById('message').innerHTML = 'Waiting for payment confirmation. You may close this window.';
+            // Optional: poll the server to check transaction status
+            let attempts = 0;
+            const checkStatus = setInterval(async () => {
+                if (attempts > 10) clearInterval(checkStatus);
+                attempts++;
+                try {
+                    const res = await fetch(`/api/transaction/status?ref=${reference}`);
+                    const data = await res.json();
+                    if (data.status === 'completed') {
+                        clearInterval(checkStatus);
+                        document.getElementById('message').innerHTML = '<span class="success">✅ Payment confirmed! Your card balance has been updated.</span>';
+                    } else if (data.status === 'failed') {
+                        clearInterval(checkStatus);
+                        document.getElementById('message').innerHTML = '<span class="error">❌ Payment failed. Please try again.</span>';
+                    }
+                } catch (err) { /* ignore */ }
+            }, 2000);
+        } else {
+            document.getElementById('message').innerHTML = 'Payment result unknown. Please check your dashboard.';
+        }
+    </script>
+</body>
+</html>
