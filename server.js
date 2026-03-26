@@ -316,5 +316,5 @@ app.get('/api/card/:cardId/transactions', async (req, res) => {
     res.json({ success: true, transactions: data });
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`✅ Virtual card server running on port ${PORT}`));
